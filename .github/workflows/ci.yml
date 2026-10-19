@@ -1,0 +1,19 @@
+name: dotnet-contracts
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet build examples/Proxy
+      - run: dotnet run --project tests/ContractTests
+      - run: dotnet pack src/Kite.Payments -c Release -o artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts/*.nupkg

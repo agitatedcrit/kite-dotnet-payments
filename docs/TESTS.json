@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-10-19T01:57:09.027Z",
+  "project": "kite-dotnet-payments",
+  "status": "PASS",
+  "test_cases": null,
+  "dotnet_assertions": 24,
+  "evidence_level": "E1",
+  "scope": "Local contracts; nine shared seller tests are repeated in five consumer repositories",
+  "live_payment_performed": false,
+  "extra": {
+    "local_nuget_consumer": "PASS"
+  }
+}

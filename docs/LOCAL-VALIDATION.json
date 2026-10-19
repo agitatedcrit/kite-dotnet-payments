@@ -1,0 +1,12 @@
+{
+  "project": "kite-dotnet-payments",
+  "status": "PASS",
+  "checks": [
+    "actual ASP.NET HTTP server",
+    "free health endpoint",
+    "x402 v2 quotation header/body",
+    "operator authentication"
+  ],
+  "evidence_level": "E1",
+  "actual_spend": false
+}
