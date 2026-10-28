@@ -119,5 +119,29 @@
       "docs/LOCAL-VALIDATION.json"
     ],
     "evidence_level": "E1"
+  },
+  "implementation_version": "0.2.0",
+  "contract_review": {
+    "observed_at": "2026-10-28T12:23:40.564Z",
+    "passport_commit": "b005121f008c005fc94cf42b2d29e9a3aba2ec99",
+    "schema_changed": false,
+    "a2a_changed": false,
+    "network_compatibility": "REQUIRES_REAL_CLIENT_VALIDATION",
+    "real_payment_performed": false,
+    "evidence": [
+      "docs/KITE-INTEGRATION.md",
+      "CHANGELOG.md"
+    ]
+  },
+  "upgrade_validation": {
+    "version": "0.2.0",
+    "observed_at": "2026-10-28T12:45:35.290Z",
+    "status": "PASS_LOCAL",
+    "evidence": [
+      "docs/TESTS.json",
+      "docs/UPDATE-VALIDATION.json"
+    ],
+    "funded_passport_purchase": false,
+    "official_catalog_submission": false
   }
 }

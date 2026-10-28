@@ -2,7 +2,7 @@
 
 ASP.NET Core x402 seller middleware and a bounded JSON proxy.
 
-Version 0.1.0 is an AI-assisted engineering evaluation release, developed under one operator and assigned to this GitHub account. It is not evidence of independent human adoption, official Kite approval, Electric Capital inclusion or successful live payment.
+Version 0.2.0 is an AI-assisted engineering evaluation release, developed under one operator and assigned to this GitHub account. It is not evidence of independent human adoption, official Kite approval, Electric Capital inclusion or successful live payment.
 
 ## Run and verify
 
@@ -32,3 +32,9 @@ Read [compatibility.json](compatibility.json) and [the protocol boundary](docs/P
 ## Scope and evidence
 
 [Original PRD](docs/PRD.md) describes the full target, not a claim that every external acceptance gate has passed. [Event contract](docs/EVENTS.md) defines the application records. The standalone repositories share protocol/storage support code, with distinct business implementations and tests. The license is MIT; third-party dependencies keep their upstream licenses. Reproduce failures without publishing payment signatures, account credentials or private files.
+
+## 2026-10-28 update
+
+The JSON proxy middleware now accepts an explicit PaidPath and Method in KiteOptions. Requests for other routes continue through the ASP.NET app. The example exposes PAID_PATH and PAID_METHOD. Keep the sample URL only when intentionally using the sample. Each middleware instance protects one configured JSON upstream; it does not implement general stream/media billing or claim SIWX support. Use the operator-authenticated recovery endpoint for this release.
+
+See [Kite integration and interoperability boundaries](docs/KITE-INTEGRATION.md) and [this release's changes](CHANGELOG.md).

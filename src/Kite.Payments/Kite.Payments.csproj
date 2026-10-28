@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><PackageId>Kite.Evaluation.Payments</PackageId><Version>0.1.0</Version><Authors>agitatedcrit</Authors><Description>Bounded x402 v2 seller middleware for Kite. AI-assisted evaluation project; live Passport verification pending.</Description><PackageLicenseExpression>MIT</PackageLicenseExpression><RepositoryUrl>https://github.com/agitatedcrit/kite-dotnet-payments</RepositoryUrl></PropertyGroup>
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><PackageId>Kite.Evaluation.Payments</PackageId><Version>0.2.0</Version><Authors>agitatedcrit</Authors><Description>Bounded x402 v2 seller middleware for Kite. AI-assisted evaluation project; live Passport verification pending.</Description><PackageLicenseExpression>MIT</PackageLicenseExpression><RepositoryUrl>https://github.com/agitatedcrit/kite-dotnet-payments</RepositoryUrl></PropertyGroup>
   <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /></ItemGroup>
 </Project>

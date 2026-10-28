@@ -43,16 +43,31 @@ foreach (var mode in new[] { "success", "invalid_signature", "upstream_500", "ba
     }
     finally { Directory.Delete(folder, true); }
 }
+{
+    var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    var options = new KiteOptions("https://seller.example", "eip155:2368", "0x" + new string('b',40), "0x" + new string('c',40), "0.01", 6, "https://facilitator.example", "https://upstream.example/query", folder, Convert.ToHexString(RandomNumberGenerator.GetBytes(32)), PaidPath:"/api/research", Method:"PUT");
+    var events = new List<string>(); var fallthrough = false;
+    var middleware = new KiteMiddleware(_ => {fallthrough=true;return Task.CompletedTask;}, options, new HttpClient(new Stub("success",events,"PUT")));
+    try {
+        var other = new DefaultHttpContext(); other.Request.Path="/v1/unrelated"; await middleware.InvokeAsync(other); Check(fallthrough,"unrelated routes continue through the app");
+        var c = new DefaultHttpContext();c.Request.Path="/api/research";c.Request.Method="PUT";c.Request.ContentType="application/json";c.Request.Body=new MemoryStream(Encoding.UTF8.GetBytes("{\"operation_id\":\"custom-route\"}"));c.Response.Body=new MemoryStream();await middleware.InvokeAsync(c);
+        Check(c.Response.StatusCode==402,"configured paid route outside v1");
+        var challenge = JsonNode.Parse(Convert.FromBase64String(c.Response.Headers["PAYMENT-REQUIRED"].ToString()));Check(challenge?["resource"]?["url"]?.GetValue<string>()=="https://seller.example/api/research","quote binds configured route");
+        var paid = new DefaultHttpContext(); paid.Request.Path="/api/research";paid.Request.Method="PUT";paid.Request.ContentType="application/json";paid.Request.Body=new MemoryStream(Encoding.UTF8.GetBytes("{\"operation_id\":\"custom-route\"}"));paid.Response.Body=new MemoryStream();
+        paid.Request.Headers["PAYMENT-SIGNATURE"]=Convert.ToBase64String(Encoding.UTF8.GetBytes(new JsonObject{["x402Version"]=2,["accepted"]=middleware.Requirement(),["resource"]=new JsonObject{["url"]="https://seller.example/api/research"},["payload"]=new JsonObject{["signature"]="synthetic-only"}}.ToJsonString()));
+        await middleware.InvokeAsync(paid);Check(paid.Response.StatusCode==200,"custom method reaches configured upstream and settles after result");
+    } finally {Directory.Delete(folder,true);}
+}
 Console.WriteLine($"PASS {passed} assertions; E1 only, no live payment");
 
-sealed class Stub(string mode, List<string> events) : HttpMessageHandler
+sealed class Stub(string mode, List<string> events, string expectedMethod = "POST") : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
     {
         string json; var status = HttpStatusCode.OK;
         if (request.RequestUri!.AbsolutePath.EndsWith("verify")) { events.Add("verify"); json = new JsonObject { ["isValid"] = mode != "invalid_signature", ["payer"] = "0x" + new string('a', 40) }.ToJsonString(); }
         else if (request.RequestUri.AbsolutePath.EndsWith("settle")) { events.Add("settle"); if (mode == "unknown") throw new HttpRequestException("response lost"); json = "{\"success\":true,\"transaction\":\"mock-settlement\",\"network\":\"eip155:2368\"}"; }
-        else { events.Add("business"); status = mode == "upstream_500" ? HttpStatusCode.InternalServerError : HttpStatusCode.OK; json = mode == "bad_json" ? "invalid" : "{\"answer\":42}"; }
+        else { if (request.Method.Method != expectedMethod) throw new InvalidOperationException("upstream method mismatch"); events.Add("business"); status = mode == "upstream_500" ? HttpStatusCode.InternalServerError : HttpStatusCode.OK; json = mode == "bad_json" ? "invalid" : "{\"answer\":42}"; }
         return Task.FromResult(new HttpResponseMessage(status) { Content = new StringContent(json, Encoding.UTF8, "application/json") });
     }
 }

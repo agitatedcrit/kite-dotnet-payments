@@ -1,3 +1,5 @@
+> 2026-10-28 update: approval/allowance behavior below includes historical design examples. Use docs/KITE-INTEGRATION.md and the pinned current Passport contract for allowance_available, --separate/--preview and reuse_candidates. No live payment has been performed.
+
 # 总体接入设计
 
 版本 1.0 · 2026-10-18 · 设计文件。以下是工程方案与验收目标，不是已运行结果。除明确标为官方 CLI 的命令外，函数、内部接口、事件和包名都是拟实现接口。

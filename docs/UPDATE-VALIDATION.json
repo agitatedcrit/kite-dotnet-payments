@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-10-28T12:45:35.290Z",
+  "version": "0.2.0",
+  "project": "kite-dotnet-payments",
+  "status": "PASS",
+  "node_runtime": "v24.22.1",
+  "test_cases": null,
+  "dotnet_assertions": 28,
+  "evidence_level": "E1",
+  "actual_spend": false,
+  "log_sha256": "ceb1e3799a050fe3702302719176d4c7063202c8111699f5b92b4fc5a9424253",
+  "http": {
+    "external_probe": {
+      "failed": 0,
+      "blocked": 0,
+      "live_pass": 0,
+      "mock_pass": 0,
+      "unsigned_http_pass": 3
+    },
+    "project": "kite-dotnet-payments",
+    "status": "PASS",
+    "checks": [
+      "actual ASP.NET HTTP server",
+      "free health endpoint",
+      "x402 v2 quotation header/body",
+      "operator authentication"
+    ],
+    "evidence_level": "E1",
+    "actual_spend": false
+  },
+  "external_dotnet_contract": {
+    "profile": "external",
+    "target": "http://127.0.0.1:4421/v1/sample/query",
+    "observed_at": "2026-10-28T12:34:03.339Z",
+    "cases": [
+      {
+        "scenario": "external_challenge",
+        "status": "passed",
+        "failures": [],
+        "evidence_source": "external_http_unsigned",
+        "evidence_level": "E1",
+        "actual_spend": false
+      },
+      {
+        "scenario": "external_malformed_payment",
+        "status": "passed",
+        "failures": [],
+        "evidence_source": "external_http_unsigned",
+        "evidence_level": "E1",
+        "actual_spend": false
+      },
+      {
+        "scenario": "external_quote_stability",
+        "status": "passed",
+        "failures": [],
+        "evidence_source": "external_http_unsigned",
+        "evidence_level": "E1",
+        "actual_spend": false
+      }
+    ],
+    "summary": {
+      "failed": 0,
+      "blocked": 0,
+      "live_pass": 0,
+      "mock_pass": 0,
+      "unsigned_http_pass": 3
+    },
+    "funded_interoperability": "NOT_TESTED"
+  }
+}

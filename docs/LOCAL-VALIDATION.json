@@ -1,4 +1,11 @@
 {
+  "external_probe": {
+    "failed": 0,
+    "blocked": 0,
+    "live_pass": 0,
+    "mock_pass": 0,
+    "unsigned_http_pass": 3
+  },
   "project": "kite-dotnet-payments",
   "status": "PASS",
   "checks": [

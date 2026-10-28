@@ -12,7 +12,7 @@ namespace Kite.Payments;
 
 public sealed record KiteOptions(string Origin, string Network, string Asset, string PayTo, string PriceUsd,
     int Decimals, string Facilitator, string UpstreamUrl, string DataDirectory, string DataKey,
-    string? UpstreamBearer = null, JsonObject? Extra = null);
+    string? UpstreamBearer = null, JsonObject? Extra = null, string PaidPath = "/v1/sample/query", string Method = "POST");
 
 public static class Prices
 {
@@ -59,6 +59,7 @@ public sealed class KiteMiddleware
         this.next = next; this.options = options; this.client = client;
         if (options.Network is not ("eip155:2366" or "eip155:2368") || !Regex.IsMatch(options.Asset, "^0x[0-9a-fA-F]{40}$") || !Regex.IsMatch(options.PayTo, "^0x[0-9a-fA-F]{40}$") || options.PayTo == "0x" + new string('0', 40)) throw new ArgumentException("Invalid network or asset/payTo");
         if (new Uri(options.Facilitator).Scheme != "https" || new Uri(options.UpstreamUrl).Scheme != "https") throw new ArgumentException("HTTPS required");
+        if (!Regex.IsMatch(options.PaidPath, "^/[A-Za-z0-9_/-]+$") || options.PaidPath.Contains("//") || options.PaidPath.Split('/').Any(p => p is "." or "..") || options.Method is not ("POST" or "PUT" or "PATCH")) throw new ArgumentException("Explicit paid JSON route and method required");
         journal = new Journal(options.DataDirectory, options.DataKey);
     }
     public JsonObject Requirement() => new() { ["scheme"] = "exact", ["network"] = options.Network, ["asset"] = options.Asset, ["amount"] = Prices.Units(options.PriceUsd, options.Decimals), ["payTo"] = options.PayTo, ["maxTimeoutSeconds"] = 120, ["extra"] = options.Extra?.DeepClone() ?? new JsonObject() };
@@ -82,8 +83,7 @@ public sealed class KiteMiddleware
     }
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!context.Request.Path.StartsWithSegments("/v1")) { await next(context); return; }
-        if (context.Request.Path != "/v1/sample/query" || context.Request.Method != "POST") { context.Response.StatusCode = 404; return; }
+        if (context.Request.Path != options.PaidPath || context.Request.Method != options.Method) { await next(context); return; }
         if (context.Request.ContentType?.StartsWith("application/json") != true || context.Request.ContentLength > 1048576) { context.Response.StatusCode = 415; return; }
         JsonObject input;
         try { using var requestContent = new StreamContent(context.Request.Body); input = JsonNode.Parse(await Bounded(requestContent, 1048576))!.AsObject(); }
@@ -114,7 +114,7 @@ public sealed class KiteMiddleware
             JsonNode result;
             try
             {
-                using var upstream = new HttpRequestMessage(HttpMethod.Post, options.UpstreamUrl) { Content = new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json") };
+                using var upstream = new HttpRequestMessage(new HttpMethod(options.Method), options.UpstreamUrl) { Content = new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json") };
                 if (options.UpstreamBearer is not null) upstream.Headers.Authorization = new("Bearer", options.UpstreamBearer);
                 using var response = await client.SendAsync(upstream, HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
                 if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.MediaType != "application/json") throw new InvalidDataException();
